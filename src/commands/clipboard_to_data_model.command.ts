@@ -42,7 +42,7 @@ export const transformFromClipboardToDataModel = async () => {
     )}`;
   }
   const className = await showPrompt(
-    "Enter the class name (note that the name does not include `data` in postfix and `api` in prefix)",
+    "Enter the class name",
     "user_info"
   );
 
@@ -93,7 +93,7 @@ export async function createClass(settings: Settings) {
 
   for await (var classDef of classes) {
     const enhancement = settings.model.enhancement;
-    const fileName = `api_${classDef.path}${enhancement}_data.dart`;
+    const fileName = `${classDef.path}${enhancement}.dart`;
     const file = path.join(`${settings.targetDirectory}`, fileName);
 
     if (fs.existsSync(file)) {

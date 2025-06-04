@@ -159,16 +159,6 @@ export class ClassDefinition {
           ?.replace("List<dynamic>", "List<dynamic>")
           .replace("List<num>", "List<double>")}`;
 
-    if (typeDef.isList) {
-      if (!typeDef.isPrimitive) {
-        return `${type.replace("<", "<Api").replace(">", "")}Data>`;
-      }
-    } else {
-      if (!typeDef.isPrimitive) {
-        return `Api${type}Data`;
-      }
-    }
-
     return `${type}`;
   }
 
@@ -206,11 +196,9 @@ export class ClassDefinition {
 
     if (valueType.startsWith("List")) {
       return (
-        "<Api" +
-        (
-          valueType.substring(5, valueType.length - 1)
-        ) +
-        "Data>[]"
+        "<" +
+        valueType.substring(5, valueType.length - 1) +
+        ">[]"
       );
     }
 
@@ -221,7 +209,7 @@ export class ClassDefinition {
     }
 
     // Object
-    return `Api${valueType}Data` + "()";
+    return `${valueType}()`;
   }
 
   private convertNullableTypeToNonNullableType(t: string): string {
@@ -235,15 +223,15 @@ export class ClassDefinition {
   private freezedField(): string {
     var sb = "";
     const privatConstructor = printLine(
-      `const Api${this.name}Data._();\n`,
+      `const ${this.name}._();\n`,
       2,
       1
     );
     sb += printLine("@freezed");
-    sb += printLine(`class Api${this.name}Data with `, 1);
-    sb += printLine(`_$Api${this.name}Data {`);
+    sb += printLine(`class ${this.name} with `, 1);
+    sb += printLine(`_${this.name} {`);
     sb += privatConstructor;
-    sb += printLine(`const factory Api${this.name}Data({`, 1, 1);
+    sb += printLine(`const factory ${this.name}({`, 1, 1);
     for (const typeDef of this.fields.map((v) => v.typeDef)) {
       const fieldName = typeDef.getName(this._privateFields);
       const jsonKey = `@JsonKey(name: '${typeDef.jsonKey}') `;
@@ -260,7 +248,7 @@ export class ClassDefinition {
       // sb += printLine(`${this.addType(typeDef)} ${fieldName},`);
       // sb += printLine(`dynamic ${fieldName},`);
     }
-    sb += printLine(`}) = _Api${this.name}Data;\n`, 1, 1);
+    sb += printLine(`}) = _${this.name};\n`, 1, 1);
     // sb += printLine(this.defaultVars(), 1);
     sb += printLine(`${this.codeGenJsonParseFunc()}`);
     sb += printLine("}\n", 1);
@@ -269,8 +257,8 @@ export class ClassDefinition {
 
   private importsForParts(): string {
     var imports = "";
-    imports += `part 'api_${this._path}${this.nameEnhancement}_data.freezed.dart';\n`;
-    imports += `part 'api_${this._path}${this.nameEnhancement}_data.g.dart';\n`;
+    imports += `part '${this._path}${this.nameEnhancement}.freezed.dart';\n`;
+    imports += `part '${this._path}${this.nameEnhancement}.g.dart';\n`;
     if (imports.length === 0) {
       return imports;
     } else {
@@ -287,7 +275,7 @@ export class ClassDefinition {
 
     for (const name of names) {
       if (name !== null) {
-        imports += `import 'api_${name}${this.nameEnhancement}_data.dart';\n`;
+        imports += `import '${name}${this.nameEnhancement}.dart';\n`;
       }
     }
 
@@ -300,9 +288,9 @@ export class ClassDefinition {
 
   private codeGenJsonParseFunc(): string {
     let sb = "";
-    sb += printLine(`factory Api${this.name}Data.`, 2, 1);
+    sb += printLine(`factory ${this.name}.`, 2, 1);
     sb += "fromJson(Map<String, dynamic> json) => ";
-    sb += `_$Api${this.name}DataFromJson(json);`;
+    sb += `_${this.name}FromJson(json);`;
     return sb;
   }
 
